@@ -1,35 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
+import { gql, useQuery } from "@apollo/client";
+import "./App.css";
 function App() {
-  const [count, setCount] = useState(0)
+  const GET_ALL_BOOKS = gql`
+    query AllBooks {
+      allBooks {
+        id
+        title
+        description
+        author
+        price
+        pages
+      }
+    }
+  `;
 
+  const { loading, error, data } = useQuery(GET_ALL_BOOKS);
+
+  if (loading) return <p>Loading ... </p>;
+  if (error) return <p>Error: {error.message}</p>;
+  console.log(data);
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="book-container">
+      {data.allBooks.map(({ id, title, description, author, price, pages }) => (
+        <div className="book-card" key={`${author}-${id}`}>
+          <h2>{title}</h2>
+          <h3>by {author}</h3>
+          <p>{description}</p>
+          <p>
+            <strong>Pages:</strong> {pages}
+          </p>
+          <p>
+            <strong>Price:</strong> ${price}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
 }
 
-export default App
+export default App;
